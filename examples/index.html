@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable = no" name="viewport">
+    <meta charset="utf-8" />
+    <title>ZThreader example</title>
+    <script type="text/javascript" src="../src/zgor/ZThreader.js"></script>
+    <script type="text/javascript" src="../src/zgor/ZThread.js"></script>
+</head>
+<body>
+    <div id="container">
+        <h1>Example JavaScript "threading" application</h1>
+        <p>
+            Below two buttons to execute a heavy operation.
+        </p>
+        <p>
+            The <strong>normal</strong> one will complete
+            faster, but will leave the application unresponsive (there should be a GIF image
+            showing a spinning animation during operation which is likely to be frozen, and on
+            some browsers you'd even be unable to switch to different tabs!). As a matter of fact, if
+            you're unlucky the browser/tab might even crash as the script execution takes longer than
+            the browsers seems feasible!!
+        </p>
+        <p>
+            The <strong>threaded</strong> one will take slightly longer, but will leave plenty of
+            CPU cycles to render the application interface, keeping it responsive (i.e. GIF animation
+            should run smoothly, switching to other tabs should be possible (will postpone script execution
+            until return though!). As a matter of fact, if you're feeling adventurous, you can click this
+            button multiple times to run several threads at the same time (the will each take longer to
+            complete, but the UI should remain responsive!)
+        </p>
+        <p>
+            Upon completion of each individual execution, an alert box should popup to show the results (elapsed time).
+        </p>
+        <button id="normal"   onclick="normal();">normal execution</button>
+        <button id="threaded" onclick="threaded();">threaded execution</button>
+        <div id="state"></div>
+        <img id="loader" src="./loader.gif" style="display:none;" />
+    </div>
+    <script type="text/javascript">
+
+        // initialize ZThreader to ensure 60 fps animation at 40% CPU load
+        zgor.ZThreader.init( .4, 60 );
+
+        var MAX_ITERATIONS  = 15000000;
+        var startTime, elapsedTime;
+        var isRunning = false;
+
+        // invoked when starting the execution
+        function handleStart()
+        {
+            isRunning = true;
+
+            document.getElementById( "loader" ).style.display = "block";
+            startTime = +new Date();
+        }
+
+        // invoked when completing a full execution
+        function handleComplete()
+        {
+            elapsedTime = +new Date() - startTime;
+
+            if ( zgor.ZThreader.getAmountOfThreads() === 0 )
+            {
+                isRunning = false;
+
+                document.getElementById( "loader" ).style.display = "none";
+                showState( "currently running 0 operations" );
+                alert( "total operation(s) took: " + elapsedTime + " milliseconds to complete." );
+            }
+            else {
+                showState( "currently running " + zgor.ZThreader.getAmountOfThreads() + " concurrent threads" );
+            }
+        }
+
+        function showState( msg )
+        {
+            document.getElementById( "state").innerHTML = msg;
+        }
+
+        // the fiendishly heavy function we'd like to execute
+
+        function heavyOperation( number )
+        {
+            Math.sin( Math.pow( Math.random() * MAX_ITERATIONS, number ));
+        }
+
+        // the normal, non-threaded execution of the heavy function
+        // this should take roughly six seconds on a 2.8 gHz i7 processor
+
+        function normal()
+        {
+            if ( isRunning )
+                return;
+
+            handleStart();
+
+            for ( var i = 0; i < MAX_ITERATIONS; ++i )
+            {
+                heavyOperation( i );
+            }
+            handleComplete();
+        }
+
+        // the threaded version of running the fiendishly heavy function
+
+        function threaded()
+        {
+            var thread = new zgor.ZThread( handleComplete );
+
+            // here we define our own custom override of
+            // the ZThread internal execution handler to
+            // run the heavy operation
+
+            thread._executeInternal = function()
+            {
+                // the amount of times we call the "heavyOperation"-function
+                // per iteration of the internal execution method
+                var stepsPerIteration = 2500;
+
+                for ( var i = 0; i < stepsPerIteration; ++i )
+                {
+                    if ( this._iterations >= MAX_ITERATIONS )
+                    {
+                        return true;
+                    }
+                    else {
+                        // execute operation (and increment iteration)
+                        heavyOperation( ++this._iterations );
+                    }
+                }
+                return false;
+            };
+
+            handleStart();
+            thread.run();
+
+            showState( "currently running " + zgor.ZThreader.getAmountOfThreads() + " concurrent threads" );
+        }
+
+    </script>
+</body>
