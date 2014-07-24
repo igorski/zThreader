@@ -19,7 +19,8 @@
             showing a spinning animation during operation which is likely to be frozen, and on
             some browsers you'd even be unable to switch to different tabs!). As a matter of fact, if
             you're unlucky the browser/tab might even crash as the script execution takes longer than
-            the browsers seems feasible!!
+            the browsers seems feasible!! As a matter of fact, open this page in a new window and
+            test the "normal" button there in case the thing decides to crash!!
         </p>
         <p>
             The <strong>threaded</strong> one will take slightly longer, but will leave plenty of
@@ -42,7 +43,7 @@
         // initialize ZThreader to ensure 60 fps animation at 40% CPU load
         zgor.ZThreader.init( .4, 60 );
 
-        var MAX_ITERATIONS  = 15000000;
+        var MAX_ITERATIONS  = 50000000; // a ridiculous amount to overload the CPU
         var startTime, elapsedTime;
         var isRunning = false;
 
@@ -86,7 +87,6 @@
         }
 
         // the normal, non-threaded execution of the heavy function
-        // this should take roughly six seconds on a 2.8 gHz i7 processor
 
         function normal()
         {
