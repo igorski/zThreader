@@ -26,8 +26,8 @@ zThreader requires no other JavaScript libraries and thus can be used within any
 that, to leverage CPU consumption, zThreader uses requestAnimationFrame. If your project is to support older browsers
 without this feature, you can easily use a shim / polyfill for requestAnimationFrame and still use zThreader.
 
-Using oogle Closure ? Nice. Enjoy the compression
-=================================================
+Using Google Closure ? Nice. Enjoy the compression
+==================================================
 
 zThreader has been annotated extensively with JSDocs, allowing the source to minimized with maximum compression when
 using the Closure compiler by Google.
