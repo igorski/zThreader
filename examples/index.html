@@ -27,7 +27,7 @@
             CPU cycles to render the application interface, keeping it responsive (i.e. GIF animation
             should run smoothly, switching to other tabs should be possible (will postpone script execution
             until return though!). As a matter of fact, if you're feeling adventurous, you can click this
-            button multiple times to run several threads at the same time (the will each take longer to
+            button multiple times to run several threads at the same time (they will each take longer to
             complete, but the UI should remain responsive!)
         </p>
         <p>
@@ -43,9 +43,11 @@
         // initialize ZThreader to ensure 60 fps animation at 40% CPU load
         zgor.ZThreader.init( .4, 60 );
 
-        var MAX_ITERATIONS  = 50000000; // a ridiculous amount to overload the CPU
+        var MAX_ITERATIONS  = 15000000; // a ridiculous amount to overload the CPU
         var startTime, elapsedTime;
         var isRunning = false;
+        var isRunningNormal = false;
+        var stats = { "normal" : 0, "concurrent" : 0 };
 
         // invoked when starting the execution
         function handleStart()
@@ -61,13 +63,38 @@
         {
             elapsedTime = +new Date() - startTime;
 
+            if ( isRunningNormal )
+                stats.normal = elapsedTime;
+
             if ( zgor.ZThreader.getAmountOfThreads() === 0 )
             {
                 isRunning = false;
 
                 document.getElementById( "loader" ).style.display = "none";
+
                 showState( "currently running 0 operations" );
-                alert( "total operation(s) took: " + elapsedTime + " milliseconds to complete." );
+                var msg;
+
+                if ( isRunningNormal )
+                {
+                    msg = "total operation(s) took: " + elapsedTime + " milliseconds to complete.";
+                }
+                else
+                {
+                    // calculate some statistics
+                    msg = ( "total " + stats.concurrent + " operation(s) took: " + elapsedTime + " milliseconds to complete" );
+
+                    if ( stats.concurrent > 1 ) {
+                        msg += " ( " + ( elapsedTime / stats.concurrent  ).toFixed( 0 ) + " milliseconds per operation ) ";
+                    }
+
+                    if ( stats.normal != 0 ) {
+                        msg += " ran at " + (( stats.normal / ( elapsedTime / stats.concurrent )) * 100 ).toFixed( 2 ) + " % of un-threaded speed";
+                    }
+
+                    stats.concurrent = 0; // reset
+                }
+                alert( msg );
             }
             else {
                 showState( "currently running " + zgor.ZThreader.getAmountOfThreads() + " concurrent threads" );
@@ -93,6 +120,8 @@
             if ( isRunning )
                 return;
 
+            isRunningNormal = true;
+
             handleStart();
 
             for ( var i = 0; i < MAX_ITERATIONS; ++i )
@@ -100,6 +129,7 @@
                 heavyOperation( i );
             }
             handleComplete();
+            isRunningNormal = false;
         }
 
         // the threaded version of running the fiendishly heavy function
@@ -134,6 +164,8 @@
 
             handleStart();
             thread.run();
+
+            stats.concurrent = Math.max( stats.concurrent, zgor.ZThreader.getAmountOfThreads() );
 
             showState( "currently running " + zgor.ZThreader.getAmountOfThreads() + " concurrent threads" );
         }

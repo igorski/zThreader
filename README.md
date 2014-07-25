@@ -16,7 +16,26 @@ of keeping your application feel smooth and responsive PLUS overcoming the dread
 should make you consider using this approach. Clever benchmarking of your custom operations can make the extra processing
 time actually negligible!
 
-If in doubt, check the live demo:
+If in doubt, check the live demo below.
+
+Dependencies
+============
+
+zThreader requires no other JavaScript libraries and thus can be used within any context. There is no super secret
+"HTML5"-stuff going on either, so it should work on pretty much anything including Internet Explorer 6 (!). Having said
+that, to leverage CPU consumption, zThreader uses requestAnimationFrame. If your project is to support older browsers
+without this feature, you can easily use a shim / polyfill for requestAnimationFrame and still use zThreader.
+
+Using oogle Closure ? Nice. Enjoy the compression
+=================================================
+
+zThreader has been annotated extensively with JSDocs, allowing the source to minimized with maximum compression when
+using the Closure compiler by Google.
+
+Documentation
+=============
+
+Want to view the API ? You can check the wiki here : https://github.com/igorski/zThreader/wiki/zThreader-overview
 
 LIVE DEMO
 =========
