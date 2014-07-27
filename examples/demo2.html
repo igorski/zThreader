@@ -9,26 +9,27 @@
 </head>
 <body>
     <div id="container">
-        <h1>Example JavaScript "threading" application</h1>
+        <h1>Example JavaScript "threading" application #2</h1>
         <p>
             Below two buttons to execute a heavy operation.
         </p>
         <p>
             The <strong>normal</strong> one will complete
-            faster, but will leave the application unresponsive (there should be a GIF image
-            showing a spinning animation during operation which is likely to be frozen, and on
-            some browsers you'd even be unable to switch to different tabs!). As a matter of fact, if
-            you're unlucky the browser/tab might even crash as the script execution takes longer than
-            the browsers seems feasible!! As a matter of fact, open this page in a new window and
+            faster, but will leave the application unresponsive (there <i>should</i> be a GIF image
+            showing a spinning animation during the operation but it is likely to be frozen (if it
+            appears at all!), and on some browsers you'd even be unable to switch to different tabs!).
+            As a matter of fact, if you're unlucky the browser/tab might even crash as the script execution
+            takes longer than the browser deems feasible!! Just to be sure, open this page in a new window and
             test the "normal" button there in case the thing decides to crash!!
         </p>
         <p>
-            The <strong>threaded</strong> one will take slightly longer, but will leave plenty of
+            The <strong>threaded</strong> one will take slightly longer to complete, but will leave plenty of
             CPU cycles to render the application interface, keeping it responsive (i.e. GIF animation
             should run smoothly, switching to other tabs should be possible (will postpone script execution
             until return though!). As a matter of fact, if you're feeling adventurous, you can click this
             button multiple times to run several threads at the same time (they will each take longer to
-            complete, but the UI should remain responsive!)
+            complete, but with the benefit that the UI still remains responsive! also note that upon each
+            individual threads completion, the remainder will complete faster as more resources become available).
         </p>
         <p>
             Upon completion of each individual execution, an alert box should popup to show the results (elapsed time).
@@ -100,6 +101,8 @@
                 showState( "currently running " + zgor.ZThreader.getAmountOfThreads() + " concurrent threads" );
             }
         }
+
+        // convenience method to display a message in the DOM
 
         function showState( msg )
         {

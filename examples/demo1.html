@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable = no" name="viewport">
+    <meta charset="utf-8" />
+    <title>ZThreader example</title>
+    <script type="text/javascript" src="../src/zgor/ZThreader.js"></script>
+    <script type="text/javascript" src="../src/zgor/ZThread.js"></script>
+</head>
+<body>
+    <div id="container">
+        <h1>Example JavaScript "threading" application #1</h1>
+        <p>
+            In this example, we're running two threads that function as daemons (i.e. they
+            never finish/are active during the application lifetime). This is a common practice
+            in languages like Java / C but wouldn't be possible in JavaScript (unless relying on
+            horrid tomfoolery with timeouts and callbacks to continuously change execution stacks).
+        </p>
+        <p>
+            In this example we observe a spinning GIF image (indicating the CPU has enough
+            resources left to render the UI) and can observe two text messages constantly
+            being updated by each individual thread. These threads never finish as their
+            purpose is to keep updating the text container indefinitely.
+        </p>
+        <button id="start" onclick="start();">start threads</button>
+        <div id="state1"></div>
+        <div id="state2"></div>
+        <img id="loader" src="./loader.gif" style="display:none;" />
+    </div>
+    <script type="text/javascript">
+
+        // initialize ZThreader to ensure 60 fps animation at 40% CPU load
+        zgor.ZThreader.init( .4, 60 );
+
+        var isRunning = false;
+        var thread1, thread2;
+
+        // invoked when starting the execution
+        function start()
+        {
+            if ( isRunning )
+                return;
+
+            document.getElementById( "loader" ).style.display = "block";
+
+            isRunning = true;
+            thread1 = new zgor.ZThread();
+            thread2 = new zgor.ZThread();
+
+            // here we define our own custom thread operations
+            // (the only thing we do is display a message in the DOM with a timestamp)
+            thread1._executeInternal = function()
+            {
+                showState( "state1", "thread 1 last update: " + ( +new Date() ));
+                return false; // keep returning false to keep running
+            };
+
+            thread2._executeInternal = function()
+            {
+                showState( "state2", "thread 2 last update: " + ( +new Date() ));
+                return false; // keep returning false to keep running
+            };
+
+            // start threads
+            thread1.run();
+            thread2.run();
+        }
+
+        // convenience method to display a message in the DOM
+
+        function showState( elementId, msg )
+        {
+            document.getElementById( elementId ).innerHTML = msg;
+        }
+
+    </script>
+</body>

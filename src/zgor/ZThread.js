@@ -39,6 +39,8 @@ zgor.ZThread = function( aCallback )
 
 /** @protected @type {!Function} */ zgor.ZThread.prototype._callback;
 /** @protected @type {number} */    zgor.ZThread.prototype._iterations = 0;
+/** @protected @type {number} */    zgor.ZThread.prototype._sleepTimeout;
+/** @protected @type {boolean} */   zgor.ZThread.prototype._suspended = false;
 
 /* public methods */
 
@@ -81,6 +83,38 @@ zgor.ZThread.prototype.execute = function( aAllocatedTime )
         }
     }
     return false;
+};
+
+/**
+ * suspend thread execution for given timeout
+ *
+ * @public
+ * @param {number} aTimeout in milliseconds
+ */
+zgor.ZThread.prototype.sleep = function( aTimeout )
+{
+    clearTimeout( this._sleepTimeout );
+
+    this._suspended = true;
+    var self        = this;
+
+    this._sleepTimeout = setTimeout( function()
+    {
+        self._suspended = false;
+
+    }, aTimeout );
+};
+
+/**
+ * query whether this thread can be executed
+ *
+ * @public
+ *
+ * @return {boolean}
+ */
+zgor.ZThread.prototype.isExecutable = function()
+{
+    return !this._suspended;
 };
 
 /* protected methods */

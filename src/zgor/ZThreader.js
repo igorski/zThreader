@@ -225,7 +225,7 @@ zgor.ZThreader =
         var now   = +new Date();
         var delta = now - self._lastExecution;
 
-        // only execute when it is our allotted time...
+        // only execute thread processes at the allotted time slot...
         if ( delta > self._executeInterval )
         {
             self._lastExecution = now - ( delta % self._executeInterval );
@@ -244,10 +244,21 @@ zgor.ZThreader =
             {
                 var thread = threads[ i ];
 
-                if ( thread.execute( processAllocation ))
+                if ( thread.isExecutable() )
                 {
-                    if ( self._threads.length >= 0 ) {
-                        processAllocation = timeAllocation / self._threads.length;
+                    if ( thread.execute( processAllocation ))
+                    {
+                        if ( self._threads.length >= 0 ) {
+                            processAllocation = timeAllocation / self._threads.length;
+                        }
+                    }
+                }
+                else
+                {
+                    // thread is suspended, allow more allocation for next process
+
+                    if ( self._threads.length > 1 ) {
+                        processAllocation = timeAllocation / ( self._threads.length - 1 );
                     }
                 }
             }
@@ -256,7 +267,7 @@ zgor.ZThreader =
         }
         // queue next cycle (run-method basically functions as a
         // "step"-function once it has commenced running
-        if ( threads.length > 0 ) {
+        if ( self._threads.length > 0 ) {
             zgor.ZThreader.run();
         }
     },
