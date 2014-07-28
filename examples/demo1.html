@@ -25,7 +25,11 @@
         <button id="start" onclick="start();">start threads</button>
         <div id="state1"></div>
         <div id="state2"></div>
-        <img id="loader" src="./loader.gif" style="display:none;" />
+        <div id="active-ui" style="display:none;">
+            <button id="pause" onclick="pause();">pause / unpause thread 1</button>
+            <button id="sleep" onclick="sleep();">sleep thread 2 for 5 seconds</button>
+            <img id="loader" src="./loader.gif" />
+        </div>
     </div>
     <script type="text/javascript">
 
@@ -41,7 +45,8 @@
             if ( isRunning )
                 return;
 
-            document.getElementById( "loader" ).style.display = "block";
+            // show the UI for the active thread state
+            document.getElementById( "active-ui" ).style.display = "block";
 
             isRunning = true;
             thread1 = new zgor.ZThread();
@@ -64,6 +69,25 @@
             // start threads
             thread1.run();
             thread2.run();
+        }
+
+        // pause / unpause thread 1
+
+        function pause()
+        {
+            if ( thread1.isExecutable() ) {
+                thread1.pause();
+            }
+            else {
+                thread1.unpause();
+            }
+        }
+
+        // sleep thread 2 for 5 seconds
+
+        function sleep()
+        {
+            thread2.sleep( 5000 );
         }
 
         // convenience method to display a message in the DOM

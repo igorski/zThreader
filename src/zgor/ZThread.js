@@ -41,6 +41,7 @@ zgor.ZThread = function( aCallback )
 /** @protected @type {number} */    zgor.ZThread.prototype._iterations = 0;
 /** @protected @type {number} */    zgor.ZThread.prototype._sleepTimeout;
 /** @protected @type {boolean} */   zgor.ZThread.prototype._suspended = false;
+/** @protected @type {boolean} */   zgor.ZThread.prototype._paused    = false;
 
 /* public methods */
 
@@ -54,6 +55,38 @@ zgor.ZThread.prototype.run = function()
     if ( zgor.ZThreader.add( this )) {
         this._iterations = 0;
     }
+};
+
+/**
+ * halts thread execution and removes thread from zThreader
+ *
+ * @public
+ */
+zgor.ZThread.prototype.stop = function()
+{
+    zgor.ZThreader.remove( this );
+};
+
+/**
+ * pauses thread execution, this will postpone thread
+ * execution (and leave more CPU resources to other threads)
+ * until unpause has been invoked
+ *
+ * @public
+ */
+zgor.ZThread.prototype.pause = function()
+{
+    this._paused = true;
+};
+
+/**
+ * unpauses previously halted thread execution
+ *
+ * @public
+ */
+zgor.ZThread.prototype.unpause = function()
+{
+    this._paused = false;
 };
 
 /**
@@ -86,7 +119,7 @@ zgor.ZThread.prototype.execute = function( aAllocatedTime )
 };
 
 /**
- * suspend thread execution for given timeout
+ * suspend thread execution for a given timeout
  *
  * @public
  * @param {number} aTimeout in milliseconds
@@ -114,7 +147,7 @@ zgor.ZThread.prototype.sleep = function( aTimeout )
  */
 zgor.ZThread.prototype.isExecutable = function()
 {
-    return !this._suspended;
+    return !this._suspended && !this._paused;
 };
 
 /* protected methods */
@@ -140,7 +173,7 @@ zgor.ZThread.prototype._executeInternal = function()
 zgor.ZThread.prototype.handleComplete = function()
 {
     // remove this thread from ZThreader
-    zgor.ZThreader.remove( this );
+    this.stop();
 
     // execute callback if one was registered
     if ( this._callback != null ) {

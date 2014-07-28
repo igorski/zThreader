@@ -215,7 +215,7 @@ zgor.ZThreader =
     /**
      * called by the timing function, this is what
      * actually runs all the threads, and shouldn't be
-     * invoked manually (use "start" instead)
+     * invoked manually (use "run" instead)
      *
      * @private
      */
