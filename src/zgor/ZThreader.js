@@ -237,8 +237,7 @@ zgor.ZThreader =
             timeAllocation = Math.max( timeAllocation, threadAmount );
 
             var processAllocation = timeAllocation / threadAmount;
-
-            var i = threadAmount;
+            var i = threadAmount, suspended = 0;
 
             while ( i-- )
             {
@@ -255,10 +254,11 @@ zgor.ZThreader =
                 }
                 else
                 {
-                    // thread is suspended, allow more allocation for next process
+                    // thread is suspended, allow more allocated time for next processes
+                    ++suspended;
 
                     if ( self._threads.length > 1 ) {
-                        processAllocation = timeAllocation / ( self._threads.length - 1 );
+                        processAllocation = timeAllocation / ( self._threads.length - suspended );
                     }
                 }
             }

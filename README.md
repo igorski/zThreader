@@ -10,8 +10,8 @@ To overcome this, zThreader has been created. A "zThread" is basically a base "c
 to subdivide a processor-heavy operation into smaller iterations, which will be executed whenever the web browser has CPU
 resources available. In other words : you can enjoy the number crunching of your ultra cool heavy operation(s), while still
 keeping the user interface of your application responsive while the operation is running. Additionally, you can create
-Java / C-style "daemon" operations (the type that never finish and are running in an eternal "while"-loop, which would otherwise
-lock script execution when done in JavaScript, so now you can create your awesome "eternally generating new Mandelbrots"-application!).
+Java / C-style "daemon" operations (the type that never finish and are running as an eternal "while"-loop, which would otherwise
+lock script execution when done in JavaScript), finally allowing you to create your awesome "eternally generating new Mandelbrots"-application!.
 
 Granted, this form of "fake threading" takes longer to execute as opposed to running the operation in one go, but the benefits
 of keeping your application feel smooth and responsive PLUS overcoming the dreaded crash as script execution timeouts occur,
