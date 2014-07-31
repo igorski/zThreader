@@ -98,7 +98,9 @@ zgor.ZThread.prototype.unpause = function()
  * @param {number} aAllocatedTime amount of time allocated to this thread
  *
  * @return {boolean} whether this thread has completed its actions and can be
- *                   removed from the ZThreader
+ *                   removed from the ZThreader. if the thread is to continue
+ *                   running (either indefinitely or onto a next iteration)
+ *                   value false should be returned
  */
 zgor.ZThread.prototype.execute = function( aAllocatedTime )
 {

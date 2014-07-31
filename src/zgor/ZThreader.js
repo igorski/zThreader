@@ -247,8 +247,12 @@ zgor.ZThreader =
                 {
                     if ( thread.execute( processAllocation ))
                     {
-                        if ( self._threads.length >= 0 ) {
-                            processAllocation = timeAllocation / self._threads.length;
+                        // if thread completed its lifecycle, distribute more time
+                        // among the remaining processes
+                        var remainingThreads = self._threads.length;
+
+                        if ( remainingThreads > 0 && remainingThreads > suspended ) {
+                            processAllocation = timeAllocation / ( remainingThreads - suspended );
                         }
                     }
                 }
