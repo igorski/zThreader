@@ -1,0 +1,27 @@
+{
+  "name": "zthreader",
+  "homepage": "http://www.igorski.nl/",
+  "author": "Igor Zinken (http://github.com/igorski/)",
+  "bugs": {
+    "url": "https://github.com/igorski/zThreader/issues/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/igorski/zThreader.git"
+  },
+  "description": "JavaScript library that provides pseudo-threading for leveraging resources during long, CPU intensive operations",
+  "keywords": [
+    "threading",
+    "thread",
+    "multi",
+    "pseudo",
+    "stack",
+    "cpu"
+  ],
+  "preferGlobal": false,
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "node": "0.10.*"
+  }
+}
