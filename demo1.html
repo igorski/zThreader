@@ -28,7 +28,7 @@
         <div id="active-ui" style="display:none;">
             <button id="pause" onclick="pause();">pause / unpause thread 1</button>
             <button id="sleep" onclick="sleep();">sleep thread 2 for 5 seconds</button>
-            <img id="loader" src="./loader.gif" />
+            <img id="loader" src="assets/loader.gif" />
         </div>
     </div>
     <script type="text/javascript">
@@ -36,11 +36,11 @@
         // resolve dependencies
 
         requirejs.config({
-            baseUrl : "../src/",
+            baseUrl : "src/",
             urlArgs : "bust=" + ( +new Date() )
         });
 
-        require( [ "zThreader", "zThread" ], function( zThreader, zThread )
+        require( [ "", "zThread" ], function( zThreader, zThread )
         {
             window.zThreader = zThreader;
             window.zThread   = zThread;

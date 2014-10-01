@@ -37,18 +37,18 @@
         <button id="normal"   onclick="normal();">normal execution</button>
         <button id="threaded" onclick="threaded();">threaded execution</button>
         <div id="state"></div>
-        <img id="loader" src="./loader.gif" style="display:none;" />
+        <img id="loader" src="assets/loader.gif" style="display:none;" />
     </div>
     <script type="text/javascript">
         
         // resolve dependencies
         
         requirejs.config({
-            baseUrl : "../src/",
+            baseUrl : "src/",
             urlArgs : "bust=" + ( +new Date() )
         });
 
-        require( [ "zThreader", "zThread" ], function( zThreader, zThread )
+        require( [ "", "zThread" ], function( zThreader, zThread )
         {
             window.zThreader = zThreader;
             window.zThread   = zThread;
