@@ -40,7 +40,7 @@
             urlArgs : "bust=" + ( +new Date() )
         });
 
-        require( [ "", "zThread" ], function( zThreader, zThread )
+        require( [ "zThreader", "zThread" ], function( zThreader, zThread )
         {
             window.zThreader = zThreader;
             window.zThread   = zThread;
