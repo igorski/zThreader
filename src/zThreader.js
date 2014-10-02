@@ -82,7 +82,7 @@ define( "zThreader", [ "zThread" ], function( zThread )
          *
          * @public
          *
-         * @param {zgor.ZThread} aThread
+         * @param {zThread} aThread
          * @return {boolean} whether thread has been added
          */
         add : function( aThread )
@@ -109,7 +109,7 @@ define( "zThreader", [ "zThread" ], function( zThread )
          *
          * @public
          *
-         * @param {zgor.ZThread} aThread
+         * @param {zThread} aThread
          * @return {boolean} whether thread has been found and removed
          */
         remove : function( aThread )
@@ -184,7 +184,7 @@ define( "zThreader", [ "zThread" ], function( zThread )
          *
          * @public
          *
-         * @param {zgor.ZThread} aThread
+         * @param {zThread} aThread
          * @return {boolean} whether thread has been found
          */
         hasThread : function( aThread )
@@ -278,7 +278,7 @@ define( "zThreader", [ "zThread" ], function( zThread )
 
         /**
          * @private
-         * @type {Array.<zgor.ZThread>}
+         * @type {Array.<zThread>}
          */
         _threads : [],
 
