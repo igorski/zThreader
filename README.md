@@ -20,6 +20,12 @@ time actually negligible!
 
 When in doubt, check the live demos below.
 
+## Installation
+
+You can get zThreader via NPM:
+
+    npm install zthreader
+
 Dependencies
 ============
 
