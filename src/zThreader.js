@@ -22,7 +22,20 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-define( "zThreader", [ "zThread" ], function( zThread )
+(function( aName, aModule )
+{
+    // CommonJS
+    if ( typeof module !== "undefined" )
+        module.exports = aModule();
+
+    // AMD
+    else if ( typeof define === "function" && typeof define.amd === "object" )
+        define( aName, [ "zThread" ], function() { return aModule(); });
+
+    // Browser global
+    else this[ aName ] = aModule;
+
+}( "zThreader", function()
 {
     // cache reference to animation frame, in case you wish to use this application
     // on older browsers without animationFrame support, you can rely on setTimeout/setInterval-polyfills
@@ -323,4 +336,5 @@ define( "zThreader", [ "zThread" ], function( zThread )
     };
 
     return zThreader;
-});
+
+}));

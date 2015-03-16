@@ -26,6 +26,29 @@ You can get zThreader via NPM:
 
     npm install zthreader
 
+## Project Integration
+
+zThreader is compatible with CommonJS, AMD/RequireJS or can be included in the browser via script tags:
+
+CommonJS:
+
+    var zThreader = require( "zthreader" ).zThreader;
+    var zThread   = require( "zthreader" ).zThread;
+
+(you can subsequently use a tool like Browserify to build for the browser).
+
+RequireJS:
+
+    require( [ "zThreader", "zThread" ], function( zThreader, zThread )
+    {
+        // do something...
+    });
+
+Browser:
+
+    <script type="text/javascript" src="./src/zThreader.js"></script>
+    <script type="text/javascript" src="./src/zThread.js"></script>
+
 Dependencies
 ============
 

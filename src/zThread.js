@@ -20,7 +20,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-define( "zThread", function()
+// resolve CommonJS dependencies
+
+if ( typeof module !== "undefined" )
+{
+    var zThreader = require( "./zThreader" );
+}
+
+(function( aName, aModule )
+{
+    // CommonJS
+    if ( typeof module !== "undefined" )
+        module.exports = aModule();
+
+    // AMD
+    else if ( typeof define === "function" && typeof define.amd === "object" )
+        define( aName, [ "zThreader" ], function( zThreader ) { return aModule(); });
+
+    // Browser global
+    else this[ aName ] = aModule;
+
+}( "zThread",  function()
 {
     "use strict";
 
@@ -186,4 +206,5 @@ define( "zThread", function()
     };
 
     return zThread;
-});
+
+}));
