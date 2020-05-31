@@ -1,6 +1,6 @@
 {
   "name": "zthreader",
-  "homepage": "http://www.igorski.nl/",
+  "homepage": "https://www.igorski.nl/",
   "author": "Igor Zinken (http://github.com/igorski/)",
   "main": "zthreader.js",
   "bugs": {
@@ -20,9 +20,6 @@
     "cpu"
   ],
   "preferGlobal": false,
-  "version": "1.0.1",
-  "license": "MIT",
-  "engines": {
-    "node": "0.10.*"
-  }
+  "version": "1.0.2",
+  "license": "MIT"
 }
