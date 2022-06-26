@@ -4,8 +4,7 @@
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable = no" name="viewport">
     <meta charset="utf-8" />
     <title>ZThreader example</title>
-    <!-- include RequireJS to resolve dependencies -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js" type="text/javascript"></script>
+    <script src="../dist/zthreader.min.js" type="text/javascript"></script>
 </head>
 <body>
     <div id="container">
@@ -40,24 +39,11 @@
         <img id="loader" src="assets/loader.gif" style="display:none;" />
     </div>
     <script type="text/javascript">
-        
-        // resolve dependencies
-        
-        requirejs.config({
-            baseUrl : "../src/",
-            urlArgs : "bust=" + ( +new Date() )
-        });
 
-        require( [ "zThreader", "zThread" ], function( zThreader, zThread )
-        {
-            window.zThreader = zThreader;
-            window.zThread   = zThread;
+        // initialize ZThreader to ensure 60 fps animation at 40% CPU load
+        zThreader.init( 0.4, 60 );
 
-            // initialize ZThreader to ensure 60 fps animation at 40% CPU load
-            zThreader.init( .4, 60 );
-        });
-
-        var MAX_ITERATIONS  = 15000000; // a ridiculous amount to overload the CPU
+        var MAX_ITERATIONS  = 150000000; // a ridiculous amount to overload the CPU
         var startTime, elapsedTime;
         var isRunning = false;
         var isRunningNormal = false;
@@ -117,31 +103,27 @@
 
         // convenience method to display a message in the DOM
 
-        function showState( msg )
-        {
+        function showState( msg ) {
             document.getElementById( "state").innerHTML = msg;
         }
 
         // the fiendishly heavy function we'd like to execute
 
-        function heavyOperation( number )
-        {
+        function heavyOperation( number ) {
             Math.sin( Math.pow( Math.random() * MAX_ITERATIONS, number ));
         }
 
         // the normal, non-threaded execution of the heavy function
 
-        function normal()
-        {
-            if ( isRunning )
+        function normal() {
+            if ( isRunning ) {
                 return;
-
+            }
             isRunningNormal = true;
 
             handleStart();
 
-            for ( var i = 0; i < MAX_ITERATIONS; ++i )
-            {
+            for ( var i = 0; i < MAX_ITERATIONS; ++i ) {
                 heavyOperation( i );
             }
             handleComplete();
@@ -152,31 +134,27 @@
 
         function threaded()
         {
-            var thread = new zThread( handleComplete );
+            var thread = new zThread({
+                completeFn: handleComplete,
+                // here we define our own custom override of
+                // the ZThread internal execution handler to
+                // run the heavy operation
+                executionFn: function() {
+                    // the amount of times we call the "heavyOperation"-function
+                    // per iteration of the internal execution method
+                    var stepsPerIteration = 2500;
 
-            // here we define our own custom override of
-            // the ZThread internal execution handler to
-            // run the heavy operation
-
-            thread._executeInternal = function()
-            {
-                // the amount of times we call the "heavyOperation"-function
-                // per iteration of the internal execution method
-                var stepsPerIteration = 2500;
-
-                for ( var i = 0; i < stepsPerIteration; ++i )
-                {
-                    if ( this._iterations >= MAX_ITERATIONS )
-                    {
-                        return true;
+                    for ( var i = 0; i < stepsPerIteration; ++i ) {
+                        if ( this._iterations >= MAX_ITERATIONS ) {
+                            return true;
+                        } else {
+                            // execute operation (and increment iteration)
+                            heavyOperation( ++this._iterations );
+                        }
                     }
-                    else {
-                        // execute operation (and increment iteration)
-                        heavyOperation( ++this._iterations );
-                    }
+                    return false;
                 }
-                return false;
-            };
+            });
 
             handleStart();
             thread.run();

@@ -1,0 +1,11 @@
+{
+    "include": ["zthreader.ts"],
+    "compilerOptions": {
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outFile": "dist/types/zthreader.d.ts",
+        "declarationMap": true,
+        "removeComments": true,
+    }
+}

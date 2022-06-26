@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2010-2014 Igor Zinken / igorski
+ * Igor Zinken 2010-2014 - https://www.igorski.nl
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,170 +20,138 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-// resolve CommonJS dependencies
+import zThreader from "./zThreader";
 
-if ( typeof module !== "undefined" )
+interface zThreadProps {
+    completeFn?: () => void;
+    executionFn?: () => boolean;
+};
+
+export default class zThread
 {
-    var zThreader = require( "./zThreader" );
-}
-
-(function( aName, aModule )
-{
-    // CommonJS
-    if ( typeof module !== "undefined" )
-        module.exports = aModule();
-
-    // AMD
-    else if ( typeof define === "function" && typeof define.amd === "object" )
-        define( aName, [ "zThreader" ], function( zThreader ) { return aModule(); });
-
-    // Browser global
-    else this[ aName ] = aModule;
-
-}( "zThread",  function()
-{
-    "use strict";
+    protected _callback: () => void;
+    protected _iterations: number = 0;
+    protected _sleepTimeout: number;
+    protected _suspended: boolean = false;
+    protected _paused: boolean = false;
 
     /**
      * @constructor
-     *
-     * @param {!Function=} aCallback optional callback to execute once
+     * @param {zThreadProps}
+     * @param {zThreadProps.completeFn=} optional callback to execute once
      *        this thread has finished running its actions
+     * @param {zThreadProps.executionFn=} optional function to execute upon
+     *        each iteration of the thread execution, can also be undefined
+     *        in case your prefer creating custom zThread class extensions
+     *        and override the protected _executeInternal method.
+     *        This method should return boolean true when ready, false when
+     *        execution needs to continue over another iteration
      */
-    var zThread = function( aCallback )
+    constructor( props?: zThreadProps )
     {
-        if ( aCallback ) {
-            this._callback = aCallback;
+        if ( typeof props?.executionFn === "function" ) {
+            this._executeInternal = props.executionFn;
         }
-    };
-
-    /* class properties */
-
-    /** @protected @type {!Function} */ zThread.prototype._callback;
-    /** @protected @type {number} */    zThread.prototype._iterations = 0;
-    /** @protected @type {number} */    zThread.prototype._sleepTimeout;
-    /** @protected @type {boolean} */   zThread.prototype._suspended = false;
-    /** @protected @type {boolean} */   zThread.prototype._paused    = false;
+        if ( typeof props?.completeFn === "function" ) {
+            this._callback = props.completeFn;
+        }
+        this._iterations = 0;
+        this._suspended  = false;
+        this._paused     = false;
+    }
 
     /* public methods */
 
     /**
      * starts running this thread
-     *
-     * @public
      */
-    zThread.prototype.run = function()
-    {
+    run(): void {
         if ( zThreader.add( this )) {
             this._iterations = 0;
         }
-    };
+    }
 
     /**
      * halts thread execution and removes thread from zThreader
-     *
-     * @public
      */
-    zThread.prototype.stop = function()
-    {
+    stop(): void {
         zThreader.remove( this );
-    };
+    }
 
     /**
      * pauses thread execution, this will postpone thread
      * execution (and leave more CPU resources to other threads)
      * until unpause has been invoked
-     *
-     * @public
      */
-    zThread.prototype.pause = function()
-    {
+    pause(): void {
         this._paused = true;
-    };
+    }
 
     /**
      * unpauses previously halted thread execution
-     *
-     * @public
      */
-    zThread.prototype.unpause = function()
-    {
+    unpause(): void {
         this._paused = false;
-    };
+    }
 
     /**
      * invoked by the ZThreader when this thread hits its
      * allocated time slot
      *
-     * @public
-     *
-     * @param {number} aAllocatedTime amount of time allocated to this thread
-     *
+     * @param {number} allocatedTime amount of CPU time allocated to this thread
      * @return {boolean} whether this thread has completed its actions and can be
      *                   removed from the ZThreader. if the thread is to continue
      *                   running (either indefinitely or onto a next iteration)
      *                   value false should be returned
      */
-    zThread.prototype.execute = function( aAllocatedTime )
-    {
-        var startTime = +new Date();
+    execute( allocatedTime: number ): boolean {
+        const startTime = Date.now();
 
-        while (( +new Date() - startTime ) < aAllocatedTime )
+        while (( Date.now() - startTime ) < allocatedTime )
         {
-            if ( this._executeInternal() )
-            {
+            if ( this._executeInternal() ) {
                 // completed execution ? invoke complete handler (invokes
                 // registered callback and removes this thread from the ZThreader)
-
                 this.handleComplete();
                 return true;
             }
         }
         return false;
-    };
+    }
 
     /**
-     * suspend thread execution for a given timeout
+     * suspend thread execution for a given duration
      *
      * @public
-     * @param {number} aTimeout in milliseconds
+     * @param {number} duration in milliseconds
      */
-    zThread.prototype.sleep = function( aTimeout )
-    {
-        clearTimeout( this._sleepTimeout );
-
+    sleep( duration: number ): void {
+        window.clearTimeout( this._sleepTimeout );
         this._suspended = true;
-        var self        = this;
 
-        this._sleepTimeout = setTimeout( function()
-        {
-            self._suspended = false;
-
-        }, aTimeout );
-    };
+        this._sleepTimeout = window.setTimeout( () => {
+            this._suspended = false;
+        }, duration );
+    }
 
     /**
      * query whether this thread can be executed
-     *
-     * @public
-     *
-     * @return {boolean}
      */
-    zThread.prototype.isExecutable = function()
-    {
+    isExecutable(): boolean {
         return !this._suspended && !this._paused;
-    };
+    }
 
     /* protected methods */
 
     /**
-     * @protected
+     * The method that performs the threads operations upon each iteration.
+     * This value can either be passed in the constructor or by overriding
+     * in your extending class.
      *
      * @return {boolean} whether this thread has completed its actions and can be
       *                  removed from the ZThreader
      */
-    zThread.prototype._executeInternal = function()
-    {
+    protected _executeInternal(): boolean {
         // override in subclass to track progress and return
         // state update as desired
         return false;
@@ -191,20 +159,14 @@ if ( typeof module !== "undefined" )
 
     /**
      * invoke when this thread has finished its actions
-     *
-     * @protected
      */
-    zThread.prototype.handleComplete = function()
-    {
-        // remove this thread from ZThreader
+    protected handleComplete() {
+        // remove this thread from zThreader
         this.stop();
 
         // execute callback if one was registered
-        if ( this._callback != null ) {
+        if ( typeof this._callback === "function" ) {
             this._callback();
         }
     };
-
-    return zThread;
-
-}));
+};

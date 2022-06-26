@@ -4,8 +4,7 @@
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable = no" name="viewport">
     <meta charset="utf-8" />
     <title>ZThreader example</title>
-    <!-- include RequireJS to resolve dependencies -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js" type="text/javascript"></script>
+    <script src="../dist/zthreader.min.js" type="text/javascript"></script>
 </head>
 <body>
     <div id="container">
@@ -33,21 +32,8 @@
     </div>
     <script type="text/javascript">
 
-        // resolve dependencies
-
-        requirejs.config({
-            baseUrl : "../src/",
-            urlArgs : "bust=" + ( +new Date() )
-        });
-
-        require( [ "zThreader", "zThread" ], function( zThreader, zThread )
-        {
-            window.zThreader = zThreader;
-            window.zThread   = zThread;
-
-            // initialize ZThreader to ensure 60 fps animation at 40% CPU load
-            zThreader.init( .4, 60 );
-        });
+        // initialize ZThreader to ensure 60 fps animation at 40% CPU load
+        zThreader.init( 0.4, 60 );
 
         var isRunning = false;
         var thread1, thread2;
@@ -62,22 +48,25 @@
             document.getElementById( "active-ui" ).style.display = "block";
 
             isRunning = true;
-            thread1 = new zThread();
-            thread2 = new zThread();
 
             // here we define our own custom thread operations
             // (the only thing we do is display a message in the DOM with a timestamp)
-            thread1._executeInternal = function()
-            {
-                showState( "state1", "thread 1 last update: " + ( +new Date() ));
-                return false; // keep returning false to keep running
-            };
 
-            thread2._executeInternal = function()
-            {
-                showState( "state2", "thread 2 last update: " + ( +new Date() ));
-                return false; // keep returning false to keep running
-            };
+            thread1 = new zThread({
+                executionFn: function()
+                {
+                    showState( "state1", "thread 1 last update: " + Date.now() );
+                    return false; // keep returning false to keep running
+                }
+            });
+
+            thread2 = new zThread({
+                executionFn: function()
+                {
+                    showState( "state2", "thread 2 last update: " + Date.now() );
+                    return false; // keep returning false to keep running
+                }
+            });
 
             // start threads
             thread1.run();
